@@ -20,7 +20,9 @@ public class TimeServlet extends HttpServlet {
         String date = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss ").format(new Date());
 
         resp.getWriter().write(date);
-        resp.getWriter().write("${timezone}".replace("${timezone}", parseName(req)));
+        resp.getWriter()
+                .write("${timezone}"
+                        .replace("${timezone}", parseName(req)).replace(" ","+"));
         resp.getWriter().close();
     }
 

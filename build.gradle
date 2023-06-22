@@ -1,3 +1,9 @@
+plugins {
+    id 'application'
+    id 'war'
+}
+
+
 apply plugin: 'java'
 apply plugin: 'war'
 
@@ -5,6 +11,7 @@ apply plugin: 'war'
 
 repositories {
     jcenter()
+    mavenCentral()
 }
 
 dependencies {
@@ -12,8 +19,10 @@ dependencies {
     // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
     compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
 
+}
 
-// https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation 'com.google.code.gson:gson:2.10.1'
+test {
+    useJUnitPlatform()
 }
