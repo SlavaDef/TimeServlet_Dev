@@ -21,11 +21,10 @@ public class TimezoneValidateFilter extends HttpFilter {
         if (timezone == null) {
             chain.doFilter(req, res);
         } else {
-            String tz = timezone.replace(" ", "+");
-            boolean is = ZoneId.getAvailableZoneIds().contains(tz);
-            if (is) {
+            try {
+                ZoneId.of(timezone.replace(" ", "+"));
                 chain.doFilter(req, res);
-            } else {
+            } catch (Exception e){
                 res.setStatus(400);
                 res.getWriter().write("Invalid timezone");
                 res.getWriter().close();

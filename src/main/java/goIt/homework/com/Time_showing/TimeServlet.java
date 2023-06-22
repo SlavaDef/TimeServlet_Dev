@@ -26,7 +26,7 @@ public class TimeServlet extends HttpServlet {
         resp.getWriter().close();
     }
 
-    private String parseTime(HttpServletRequest req) { // парс метод щоб не викидало помилку якщо не внисимо значень
+    private String parseTime(HttpServletRequest req) {
         if (req.getParameterMap().containsKey("timezone")) {
             return req.getParameter("timezone");
         }
