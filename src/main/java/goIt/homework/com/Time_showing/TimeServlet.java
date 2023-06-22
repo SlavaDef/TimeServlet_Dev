@@ -22,11 +22,11 @@ public class TimeServlet extends HttpServlet {
         resp.getWriter().write(date);
         resp.getWriter()
                 .write("${timezone}"
-                        .replace("${timezone}", parseName(req)).replace(" ","+"));
+                        .replace("${timezone}", parseTime(req)).replace(" ","+"));
         resp.getWriter().close();
     }
 
-    private String parseName(HttpServletRequest req) { // парс метод щоб не викидало помилку якщо не внисимо значень
+    private String parseTime(HttpServletRequest req) { // парс метод щоб не викидало помилку якщо не внисимо значень
         if (req.getParameterMap().containsKey("timezone")) {
             return req.getParameter("timezone");
         }

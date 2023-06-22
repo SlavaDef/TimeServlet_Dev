@@ -7,28 +7,29 @@ import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.TimeZone;
+import java.time.ZoneId;
 
 @WebFilter(value = "/time")
 public class TimezoneValidateFilter extends HttpFilter {
-
-    private TimeZone time;
 
     protected void doFilter(HttpServletRequest req,
                             HttpServletResponse res,
                             FilterChain chain) throws IOException, ServletException {
 
-        if (!req.getParameterMap().containsKey("timezone")) {
-            chain.doFilter(req, res);
-            return;
-        }
-        if ((!time.getID().equals("null") || (!time.getID().equals("")))) {
-            chain.doFilter(req, res);
+        String timezone = req.getParameter("timezone");
 
+        if (timezone == null) {
+            chain.doFilter(req, res);
         } else {
-            res.setStatus(400);
-            res.getWriter().write("Invalid timezone");
-            res.getWriter().close();
+            String tz = timezone.replace(" ", "+");
+            boolean is = ZoneId.getAvailableZoneIds().contains(tz);
+            if (is) {
+                chain.doFilter(req, res);
+            } else {
+                res.setStatus(400);
+                res.getWriter().write("Invalid timezone");
+                res.getWriter().close();
+            }
         }
     }
 }
