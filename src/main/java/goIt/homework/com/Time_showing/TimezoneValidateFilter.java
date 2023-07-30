@@ -1,11 +1,5 @@
 package goIt.homework.com.Time_showing;
 
-//import javax.servlet.FilterChain;
-//import javax.servlet.ServletException;
-//import javax.servlet.annotation.WebFilter;
-//import javax.servlet.http.HttpFilter;
-//import javax.servlet.http.HttpServletRequest;
-//import javax.servlet.http.HttpServletResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
@@ -37,7 +31,7 @@ public class TimezoneValidateFilter extends HttpFilter {
             try {
                 ZoneId.of(timezone.replace(" ", "+"));
                 chain.doFilter(req, res);
-            } catch (Exception e){
+            } catch (Exception e) {
                 res.setStatus(400);
                 res.getWriter().write("Invalid timezone");
                 res.getWriter().close();
