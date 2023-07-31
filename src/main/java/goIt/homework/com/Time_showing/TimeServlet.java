@@ -10,9 +10,11 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Map;
 
 @WebServlet(value = "/time")
@@ -27,6 +29,7 @@ public class TimeServlet extends HttpServlet {
         FileTemplateResolver resolver = new FileTemplateResolver();
         resolver.setPrefix("C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\bin\\templates/");
         // resolver.setPrefix("./homework");
+       // resolver.setPrefix(getClass().getClassLoader().getResource("templates").getPath());
         resolver.setSuffix(".html");
         resolver.setTemplateMode("HTML5");
         resolver.setOrder(engine.getTemplateResolvers().size());
@@ -40,19 +43,18 @@ public class TimeServlet extends HttpServlet {
 
         Cookie[] lastTimezone = req.getCookies();
 
+
         String timezone =
                 req.getParameterMap().containsKey("timezone")
                         ? req.getParameter("timezone").replace(" ", "+")
                         : lastTimezone[0].getValue();
 
 
-        resp.addCookie(new Cookie("timezone", timezone.replace(" ", "+")));
+        resp.addCookie(new Cookie("timezone", timezone));
 
-        // String timeDate = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss ")
-        // .format(new Date()) +""+ parseTime(req);
 
         String timeDate = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
-                .format(LocalDateTime.now(ZoneId.of(timezone))) + " " + parseTime(req);
+                .format(LocalDateTime.now(ZoneId.of(timezone))) + "" + timezone;
 
 
         Context simpleContext = new Context(
@@ -60,17 +62,8 @@ public class TimeServlet extends HttpServlet {
                 Map.of("params", timeDate)
         );
 
-
         engine.process("homework", simpleContext, resp.getWriter());
 
         resp.getWriter().close();
     }
-
-    private String parseTime(HttpServletRequest req) {
-        if (req.getParameterMap().containsKey("timezone")) {
-            return req.getParameter("timezone").replace(" ", "+");
-        }
-        return "UTC";
-    }
-
 }

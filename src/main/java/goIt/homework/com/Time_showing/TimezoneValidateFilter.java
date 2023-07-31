@@ -20,11 +20,6 @@ public class TimezoneValidateFilter extends HttpFilter {
 
         String timezone = req.getParameter("timezone");
 
-        if (!req.getParameterMap().containsKey("timezone") & req.getCookies() == null) {
-            res.addCookie(new Cookie("timezone", "UTC"));
-
-            chain.doFilter(req, res);
-        }
         if (timezone == null) {
             chain.doFilter(req, res);
         } else {
