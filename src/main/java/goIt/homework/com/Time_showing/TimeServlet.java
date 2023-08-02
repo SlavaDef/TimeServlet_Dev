@@ -8,18 +8,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
-
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
+
 import java.util.Map;
 
 @WebServlet(value = "/time")
 public class TimeServlet extends HttpServlet {
     private String date;
+
+    String lastTimezone = "UTC";
     private TemplateEngine engine;
 
     @Override
@@ -40,22 +40,26 @@ public class TimeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/html; charset=utf-8");
-        Cookie[] lastTimezone = req.getCookies();
+        Cookie[] cookies = req.getCookies();
 
         String timezone = req.getParameterMap().containsKey("timezone")
                 ? req.getParameter("timezone").replace(" ", "+")
-                : lastTimezone[0].getValue();
+                : lastTimezone;
 
-        if (req.getCookies() == null) {
-            date = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss 'UTC'").format(new Date());
+        resp.addCookie(new Cookie("timezone", timezone));
+
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("timezone")) {
+                lastTimezone = cookie.getValue();
+            }
         }
-        if (!req.getParameterMap().containsKey("timezone") & req.getCookies() != null) {
+
             date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
-                    .format(LocalDateTime.now(ZoneId.of(timezone))) + "" + timezone;
-        }
+                    .format(LocalDateTime.now(ZoneId.of(lastTimezone))) + "" + lastTimezone;
 
         if (req.getParameterMap().containsKey("timezone")) {
-            resp.addCookie(new Cookie("timezone", timezone));
+
+
             date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
                     .format(LocalDateTime.now(ZoneId.of(timezone))) + "" + timezone;
         }
