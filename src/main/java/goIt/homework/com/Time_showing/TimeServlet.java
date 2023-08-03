@@ -21,7 +21,9 @@ import java.util.Map;
 @WebServlet(value = "/time")
 public class TimeServlet extends HttpServlet {
     private String date;
-    String lastTimezone = "UTC";
+   private String lastTimezone = null;
+   private String timezone;
+
     private TemplateEngine engine;
 
     @Override
@@ -44,13 +46,12 @@ public class TimeServlet extends HttpServlet {
 
         Map<String, Object> respMap = new LinkedHashMap<>();
         resp.setContentType("text/html; charset=utf-8");
+
         Cookie[] cookies = req.getCookies();
 
-        String timezone = req.getParameterMap().containsKey("timezone")
-                ? req.getParameter("timezone").replace(" ", "+")
-                : lastTimezone;
-
-        resp.addCookie(new Cookie("timezone", timezone));
+        if (req.getParameterMap().containsKey("timezone")) {
+            timezone = req.getParameter("timezone").replace(" ", "+");
+        }
 
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("timezone")) {
@@ -58,27 +59,24 @@ public class TimeServlet extends HttpServlet {
             }
         }
 
-        if (lastTimezone.equals("UTC")) {
-            date = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss 'UTC' ").format(new Date());
+       date = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss 'UTC' ").format(new Date());
 
-        } else {
-            date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
-                    .format(LocalDateTime.now(ZoneId.of(lastTimezone))) + "" + lastTimezone;
-
-        }
+            if(lastTimezone!=null) {
+                date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
+                        .format(LocalDateTime.now(ZoneId.of(lastTimezone))) + "" + lastTimezone;
+            }
 
         if (req.getParameterMap().containsKey("timezone")) {
 
-
             date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
                     .format(LocalDateTime.now(ZoneId.of(timezone))) + "" + timezone;
-
+            resp.addCookie(new Cookie("timezone", timezone));
         }
 
         respMap.put("date", date);
         Context simpleContext = new Context(
                 req.getLocale(),
-              respMap
+                respMap
         );
 
         engine.process("homework", simpleContext, resp.getWriter());

@@ -42,7 +42,12 @@ public class HomeWorkServlet extends HttpServlet {
         HttpSession session = req.getSession(true);
         log((String) session.getAttribute("calcTimeZone"));
         log((String) session.getAttribute("lastTimeZone"));
+
         String timezone = URLEncoder.encode(req.getParameter("timezone"), StandardCharsets.UTF_8);
+        // Метод URLEncoder.encode() возвращает строку, которую мы объединяем в
+        // конце URL-адреса как запрос. Когда мы печатаем последнюю строку encodedUrl,
+        // она показывает весь действительный URL, а знак плюса заменяет пробелы.
+
         String lastTimezone = null;
         if(req.getCookies()!=null) {
             for (Cookie cookie : req.getCookies()) {
