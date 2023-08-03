@@ -8,11 +8,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
+
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
+import java.util.Date;
 import java.util.Map;
 
 @WebServlet(value = "/time")
@@ -53,9 +56,14 @@ public class TimeServlet extends HttpServlet {
                 lastTimezone = cookie.getValue();
             }
         }
-
+        if (lastTimezone.equals("UTC")) {
+            date = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss 'UTC' ").format(new Date());
+        } else {
             date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
                     .format(LocalDateTime.now(ZoneId.of(lastTimezone))) + "" + lastTimezone;
+        }
+        //  date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
+        //  .format(LocalDateTime.now(ZoneId.of(lastTimezone))) + "" + lastTimezone;
 
         if (req.getParameterMap().containsKey("timezone")) {
 
