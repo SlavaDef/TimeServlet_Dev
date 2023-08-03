@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @WebServlet(value = "/time")
@@ -40,6 +41,8 @@ public class TimeServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        Map<String, Object> respMap = new LinkedHashMap<>();
         resp.setContentType("text/html; charset=utf-8");
         Cookie[] cookies = req.getCookies();
 
@@ -54,11 +57,14 @@ public class TimeServlet extends HttpServlet {
                 lastTimezone = cookie.getValue();
             }
         }
+
         if (lastTimezone.equals("UTC")) {
             date = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss 'UTC' ").format(new Date());
+
         } else {
             date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
                     .format(LocalDateTime.now(ZoneId.of(lastTimezone))) + "" + lastTimezone;
+
         }
 
         if (req.getParameterMap().containsKey("timezone")) {
@@ -66,16 +72,17 @@ public class TimeServlet extends HttpServlet {
 
             date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
                     .format(LocalDateTime.now(ZoneId.of(timezone))) + "" + timezone;
+
         }
 
+        respMap.put("date", date);
         Context simpleContext = new Context(
                 req.getLocale(),
-                Map.of("params", date)
+              respMap
         );
 
         engine.process("homework", simpleContext, resp.getWriter());
         resp.getWriter().close();
     }
 }
-
 
