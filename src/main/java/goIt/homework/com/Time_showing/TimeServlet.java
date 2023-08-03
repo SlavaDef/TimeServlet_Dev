@@ -14,14 +14,12 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-
 import java.util.Date;
 import java.util.Map;
 
 @WebServlet(value = "/time")
 public class TimeServlet extends HttpServlet {
     private String date;
-
     String lastTimezone = "UTC";
     private TemplateEngine engine;
 
@@ -62,8 +60,6 @@ public class TimeServlet extends HttpServlet {
             date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
                     .format(LocalDateTime.now(ZoneId.of(lastTimezone))) + "" + lastTimezone;
         }
-        //  date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
-        //  .format(LocalDateTime.now(ZoneId.of(lastTimezone))) + "" + lastTimezone;
 
         if (req.getParameterMap().containsKey("timezone")) {
 
