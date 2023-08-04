@@ -18,12 +18,12 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@WebServlet(value = "/time")
-public class TimeServlet extends HttpServlet {
+//@WebServlet(value = "/time")
+public class TimeServlet_3 extends HttpServlet {
 
     private String lastTimezone = null;
     private String timezone;
-    private String date;
+
     private TemplateEngine engine;
 
     @Override
@@ -48,11 +48,9 @@ public class TimeServlet extends HttpServlet {
         Map<String, Object> respMap = new LinkedHashMap<>();
         resp.setContentType("text/html; charset=utf-8");
 
-        if (req.getParameterMap().containsKey("timezone")) {
-            timezone = req.getParameter("timezone").replace(" ", "+");
-        }
+        timezone = req.getParameter("timezone").replace(" ", "+");
 
-        if (req.getCookies() != null) {
+        if(req.getCookies()!=null) {
             for (Cookie cookie : req.getCookies()) {
                 if (cookie.getName().equals("lastTimezone")) {
                     lastTimezone = cookie.getValue();
@@ -60,30 +58,37 @@ public class TimeServlet extends HttpServlet {
             }
         }
 
-         date = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss 'UTC' ").format(new Date());
+       // String date = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss 'UTC' ").format(new Date());
 
-        if (lastTimezone != null) {
+
+         respMap.put("lastTimezone",DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
+                 .format(LocalDateTime.now(ZoneId.of(lastTimezone))) + "" + lastTimezone);
+
+
+    /*    if (lastTimezone != null) {
             date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
                     .format(LocalDateTime.now(ZoneId.of(lastTimezone))) + "" + lastTimezone;
-
         }
-            if (req.getParameterMap().containsKey("timezone")) {
 
-                date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
-                        .format(LocalDateTime.now(ZoneId.of(timezone))) + "" + timezone;
+        if (req.getParameterMap().containsKey("timezone")) {
+            timezone = req.getParameter("timezone").replace(" ", "+");
+            //date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
+                  //  .format(LocalDateTime.now(ZoneId.of(timezone))) + "" + timezone;
 
-                resp.addCookie(new Cookie("lastTimezone", timezone));
-            }
+*/
+        respMap.put("timeZone", DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
+                .format(LocalDateTime.now(ZoneId.of(timezone))) + "" + timezone);
+        resp.addCookie(new Cookie("lastTimezone", timezone));
 
-            respMap.put("date", date);
-            Context simpleContext = new Context(
-                    req.getLocale(),
-                    respMap
-            );
+        respMap.put("timezone", timezone);
+        Context simpleContext = new Context(
+                req.getLocale(),
+                respMap
+        );
 
-            engine.process("homework", simpleContext, resp.getWriter());
-            resp.getWriter().close();
-        }
+        engine.process("homework2", simpleContext, resp.getWriter());
+        resp.getWriter().close();
     }
+}
 
 

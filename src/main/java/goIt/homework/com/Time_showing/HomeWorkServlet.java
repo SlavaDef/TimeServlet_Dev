@@ -40,13 +40,8 @@ public class HomeWorkServlet extends HttpServlet {
         Map<String, Object> respMap = new LinkedHashMap<>();
 
         HttpSession session = req.getSession(true);
-        log((String) session.getAttribute("calcTimeZone"));
-        log((String) session.getAttribute("lastTimeZone"));
 
         String timezone = URLEncoder.encode(req.getParameter("timezone"), StandardCharsets.UTF_8);
-        // Метод URLEncoder.encode() возвращает строку, которую мы объединяем в
-        // конце URL-адреса как запрос. Когда мы печатаем последнюю строку encodedUrl,
-        // она показывает весь действительный URL, а знак плюса заменяет пробелы.
 
         String lastTimezone = null;
         if(req.getCookies()!=null) {
@@ -54,15 +49,14 @@ public class HomeWorkServlet extends HttpServlet {
                 if (cookie.getName().equals("lastReq")) {
                     lastTimezone = cookie.getValue();
                 }
-                log(cookie.getName() + "=" + cookie.getValue());
             }
         }
-
         session.setAttribute("lastTimeZone",lastTimezone);
-        log(timezone);
+
         resp.addCookie(new Cookie("lastReq", timezone));
         respMap.put("timeZone", DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now()));
-        try {
+
+
             resp.setContentType("text/html");
             respMap.put("calcTimeZone", DateTimeFormatter.ISO_DATE_TIME
                     .format(
@@ -70,10 +64,6 @@ public class HomeWorkServlet extends HttpServlet {
                     ));
             resp.addCookie(new Cookie("lastResp", (String) respMap.get("calcTimeZone")));
             session.setAttribute("calcTimeZone",(String) respMap.get("calcTimeZone"));
-        } catch (Exception e) {
-            respMap.put("error", e);
-        }
-
 
         Context simpleContext = new Context(
                 req.getLocale(),
