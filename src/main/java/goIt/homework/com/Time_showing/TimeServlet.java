@@ -10,20 +10,14 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @WebServlet(value = "/time")
 public class TimeServlet extends HttpServlet {
-
-    private String lastTimezone = null;
-    private String timezone;
-    private String date;
     private TemplateEngine engine;
 
     @Override
@@ -44,13 +38,9 @@ public class TimeServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
+        String lastTimezone = null;
         Map<String, Object> respMap = new LinkedHashMap<>();
         resp.setContentType("text/html; charset=utf-8");
-
-        if (req.getParameterMap().containsKey("timezone")) {
-            timezone = req.getParameter("timezone").replace(" ", "+");
-        }
 
         if (req.getCookies() != null) {
             for (Cookie cookie : req.getCookies()) {
@@ -60,30 +50,27 @@ public class TimeServlet extends HttpServlet {
             }
         }
 
-         date = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss 'UTC' ").format(new Date());
+        String date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
+                .format(LocalDateTime.now(ZoneId.of("UTC"))) + "UTC";
 
         if (lastTimezone != null) {
             date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
                     .format(LocalDateTime.now(ZoneId.of(lastTimezone))) + "" + lastTimezone;
-
         }
-            if (req.getParameterMap().containsKey("timezone")) {
+        if (req.getParameterMap().containsKey("timezone")) {
+            String timezone = req.getParameter("timezone").replace(" ", "+");
+            date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
+                    .format(LocalDateTime.now(ZoneId.of(timezone))) + "" + timezone;
 
-                date = DateTimeFormatter.ofPattern(" yyyy-MM-dd HH:mm:ss ")
-                        .format(LocalDateTime.now(ZoneId.of(timezone))) + "" + timezone;
-
-                resp.addCookie(new Cookie("lastTimezone", timezone));
-            }
-
-            respMap.put("date", date);
-            Context simpleContext = new Context(
-                    req.getLocale(),
-                    respMap
-            );
-
-            engine.process("homework", simpleContext, resp.getWriter());
-            resp.getWriter().close();
+            resp.addCookie(new Cookie("lastTimezone", timezone));
         }
+
+        respMap.put("date", date);
+        Context simpleContext = new Context(
+                req.getLocale(),
+                respMap
+        );
+        engine.process("homework", simpleContext, resp.getWriter());
+        resp.getWriter().close();
     }
-
-
+}
